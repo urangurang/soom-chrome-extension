@@ -1,0 +1,17 @@
+{
+  "name": "vue-extension-meditation",
+  "version": "0.0.1",
+  "scripts": {
+    "dev-local": "vite",
+    "dev": "vite build --watch",
+    "build": "bestzip dist.zip dist/"
+  },
+  "dependencies": {
+    "vue": "^3.2.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.9.1",
+    "bestzip": "^2.2.0",
+    "vite": "^2.5.10"
+  }
+}
