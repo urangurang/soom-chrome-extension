@@ -10,87 +10,50 @@ const expectedInterval = ref(30);
 
 // lifecycle
 onBeforeMount(() => {
-  const loaded = loadSoomData();
-  if (loaded !== null) {
-    existSoomData.value = true;
-    const soomData = loaded.split(",");
-    currentInterval.value = soomData[0];
-    currentCount.value = soomData[1];
-    // update soom-nextTime
-    let soomNextTime = Number(window.localStorage.getItem("soom-nextTime"));
-    if (soomNextTime !== null) {
-      while (new Date().getTime() > soomNextTime) {
-        soomNextTime += currentInterval.value * 60 * 1000;
-      }
-      window.localStorage.setItem("soom-nextTime", soomNextTime);
-    }
-  }
+  
 });
-
-
-
 
 // functions
 function createNotification() {
-  console.log(chrome)
-  console.log(chrome.notifications)
+  chrome.notifications.getAll(function(notifications) {
+    console.log(notifications);
+  });
+
+  chrome.notifications.getPermissionLevel(function(permissionLevel) {
+    if (permissionLevel === "granted") {
+      chrome.notifications.create(
+        "soom",
+        {
+          type: "basic",
+          iconUrl: "icon.png",
+          title: "Soom",
+          message: "Soom is running"
+        },
+      );
+    }
+  });
+
   chrome.notifications.create('reminder', {
     type: 'basic',
-    title: "Reminder",
+    title: "SOOM",
     iconUrl: 'urang.png',
-    message: "This is a reminder"
+    message: "Time to deep breathe"
   })
 }
 
 function loadSoomData() {
-  return window.localStorage.getItem("soom");
+  return ""
 }
 function save() {
-  window.localStorage.setItem(
-    "soom",
-    `${expectedInterval.value},${expectedCount.value}`
-  );
-  window.localStorage.setItem(
-    "soom-nextTime",
-    new Date().getTime() + expectedInterval.value * 1000 * 60
-  );
-
-  currentInterval.value = expectedInterval.value;
-  currentCount.value = expectedCount.value;
-  existSoomData.value = true;
 }
+
 function showNextSoomTime() {
-  const nextTime = Number(window.localStorage.getItem("soom-nextTime"));
-  const nextSoomTime = new Date(nextTime);
-  return nextSoomTime.toLocaleString("ko-KR", {
-    hour: "numeric",
-    minute: "numeric",
-  });
 }
 function setExpectedInterval(interval) {
-  if (expectedInterval.value + interval >= 60) {
-    expectedInterval.value = 60;
-    return;
-  } else if (expectedInterval.value + interval <= 5) {
-    expectedInterval.value = 5;
-    return;
-  }
-  expectedInterval.value += interval;
 }
 function setExpectedCount(count) {
-  if (expectedCount.value + count >= 10) {
-    expectedCount.value = 10;
-    return;
-  } else if (expectedCount.value + count <= 1) {
-    expectedCount.value = 1;
-    return;
-  }
-  expectedCount.value += count;
 }
 function reset() {
-  window.localStorage.removeItem("soom");
-  window.localStorage.removeItem("soom-nextTime");
-  existSoomData.value = false;
 }
 </script>
 <template>
@@ -134,7 +97,7 @@ function reset() {
         <div v-if="existSoomData" id="reset" @click="reset">알람 해제</div>
         <div id="save" @click="save">알람 설정</div>
       </div>
-      <div @click="createNotification">알람 테스트</div>
+      <button @click="createNotification">알람 테스트</button>
     </div>
   </div>
 </template>
